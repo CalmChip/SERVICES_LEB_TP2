@@ -53,6 +53,29 @@
           console.log(data);
           affichageDesDonnees(data);
         });
+
+      function repondre(id) {
+        fetch(`http://127.0.0.1:8000/api/messages/${id}`, {
+            method: "PUT",
+          })
+      }
+      function supprimer(id) {
+        let trueOrFalse = confirm(
+          "Are you sure you wish to delete " + id + "?"
+        );
+        if (trueOrFalse) {
+          fetch(`http://127.0.0.1:8000/api/messages/${id}`, {
+            method: "DELETE",
+          }).then(
+            fetch("http://127.0.0.1:8000/api/messages")
+              .then((res) => res.json())
+              .then((data) => {
+                affichageDesDonnees(data);
+                alert("Discussion, supprimer avec success");
+              })
+          );
+        }
+      }
       /**
        * Function affichageDesDonnees
        * Construit une liste a partie des data renvoyer par l'API
@@ -66,21 +89,23 @@
           let compteur = 1; // Permet de savoir combien il y a de commentaires
           lesCommentaires = data[i].commentaires; //Converve les commentaires
           let laDate = new Date(data[i].date);
-          affichageDiscussion =
-            "<div class='frameset'><p>" +
-            "<span>Discussion - par " +
-            "</span>" +
-            data[i].auteur +
-            " - " +
-            laDate.toLocaleString() +
-            "</p>" +
-            "<div class='textInFrame'>" +
-            "<span style='font-weight: bold'>" +
-            data[i].titre +
-            "</span><br>" +
-            "<div style='margin-top: 20px'>" +
-            data[i].description +
-            "</div></div>";
+          affichageDiscussion = `<div class='frameset'><p>
+            <span>Discussion - par
+            </span>
+            ${data[i].auteur}
+             -
+            ${laDate.toLocaleString()}
+            <button type='button' id='suprimeDiscussion' onclick="supprimer('${
+              data[i]._id
+            }')">Supprimer</button>
+            </p>
+            <div class='textInFrame'>
+            <span style='font-weight: bold'>
+            ${data[i].titre}
+            </span><br>
+            <div style='margin-top: 20px'>
+            ${data[i].description}
+            </div></div>`;
 
           for (y in lesCommentaires) {
             let laDateCommentaires = new Date(lesCommentaires[y].date);
@@ -99,7 +124,11 @@
               "</div></fieldset>";
             compteur += 1;
           }
-          affichageDiscussion += "</div>" + "</div>";
+          affichageDiscussion += `<button type='button' id='repondreDiscussion' onclick="">Répondre</button>
+          <form method='post' action=''>
+            <input type="text" name="commentaire" placeholder="entrez votre reponse ici" />
+          </form>
+          </div></div>`;
           DernierCommenteurs = data[i].commentaires.length - 1; //Conserve la position du dernier commenteurs.
           let DernierCommentateurs;
           if (data[i].commentaires.length > 0) {

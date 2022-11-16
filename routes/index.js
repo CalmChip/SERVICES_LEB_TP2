@@ -40,7 +40,7 @@ router.post("/api/messages", (req, res) => {
   let newMessage = req.body;
   Messages.ajoutMessages(newMessage, (err, msg) => {
     if (err) throw err;
-    res.json(msg);
+    affichePageWeb("pageWeb.html", res);
   });
 });
 
