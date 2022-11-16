@@ -20,13 +20,13 @@
         <input
           type="text"
           name="titre"
-          id="nouvelleDiscussion"
+          id="titre"
           placeholder="nom de la nouvelle discussion"
         />
         <input
           type="text"
           name="description"
-          id="nouvelleDiscussionContent"
+          id="description"
           placeholder="Entrez le contenue ici"
         />
         <input
@@ -101,26 +101,30 @@
           }
           affichageDiscussion += "</div>" + "</div>";
           DernierCommenteurs = data[i].commentaires.length - 1; //Conserve la position du dernier commenteurs.
+          let DernierCommentateurs;
+          if (data[i].commentaires.length > 0) {
+            DernierCommentateurs =
+              data[i].commentaires[DernierCommenteurs].auteur;
+          } else {
+            DernierCommentateurs = data[i].auteur;
+          }
           affichagePrincipale +=
             "<div class='listePrincipale'>" +
-              "<div class='textPrincipale'>" +
-              "<div class='maxWidth'>" +
-              data[i].titre +
-              "</div>" +
-              "<div class='maxWidth'>" +
-              data[i].auteur +
-              "</div>" +
-              "<div class='maxWidth'>" +
-              typeof data[i].commentaires[DernierCommenteurs].auteur !==
-            "undefined"
-              ? `(${data[i].commentaires[DernierCommenteurs].auteur})`
-              : `${data[i].auteur}` +
-                "</div>" +
-                "<div class='maxWidth'>" +
-                data[i].commentaires.length +
-                "</div></div>" +
-                affichageDiscussion +
-                "</div>";
+            "<div class='textPrincipale'>" +
+            "<div class='maxWidth'>" +
+            data[i].titre +
+            "</div>" +
+            "<div class='maxWidth'>" +
+            data[i].auteur +
+            "</div>" +
+            "<div class='maxWidth'>" +
+            DernierCommentateurs +
+            "</div>" +
+            "<div class='maxWidth'>" +
+            data[i].commentaires.length +
+            "</div></div>" +
+            affichageDiscussion +
+            "</div>";
         }
 
         $("#resultat").html(affichagePrincipale);

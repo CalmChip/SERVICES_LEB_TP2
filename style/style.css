@@ -109,6 +109,6 @@ fieldset {
 .ajoutNouvelleDiscussion > input {
   margin-top: 20px;
 }
-#nouvelleDiscussionContent {
+#description {
   height: 60px;
 }
