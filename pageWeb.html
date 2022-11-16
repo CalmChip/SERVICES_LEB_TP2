@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Services Web TP1</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <h1>Canal de discussion du TP1</h1>
+    <div class="frameContainer">
+      <button type="button" class="button">Ajouter une Discussion</button>
+      <div class="entete">
+        <div class="ajustementDiscussion">Discussion:</div>
+        <div class="ajustementAuteur">Lancée par:</div>
+        <div class="ajustementRepondant">Dernière réponse:</div>
+        <div class="ajustementNombre">Réponse:</div>
+      </div>
+      <div>
+        <div id="resultat">Patientez je récupère les messages...</div>
+        <div id="comments"></div>
+      </div>
+    </div>
+    <script>
+      fetch("http://127.0.0.1:8000/api/messages")
+        .then((res) => res.json())
+        .then((data) => {
+          affichageDesDonnees(data);
+        });
+      /**
+       * Function affichageDesDonnees
+       * Construit une liste a partie des data renvoyer par l'API
+       */
+      function affichageDesDonnees(data) {
+        let lesCommentaires = "";
+        let affichageDiscussion = ""; // Conserve l'affichage commentaires
+        let affichagePrincipale = ""; // Conserve l'affichage de toute la liste
+        let nombreCommentaires = 0;
+        for (i in data) {
+          let compteur = 1; // Permet de savoir combien il y a de commentaires
+          lesCommentaires = data[i].commentaires; //Converve les commentaires
+          let laDate = new Date(data[i].date);
+          affichageDiscussion =
+            "<div class='frameset'><p>" +
+            "<span>Discussion - par " +
+            "</span>" +
+            data[i].auteur +
+            " - " +
+            laDate.toLocaleString() +
+            "</p>" +
+            "<div class='textInFrame'>" +
+            "<span style='font-weight: bold'>" +
+            data[i].titre +
+            "</span><br>" +
+            "<div style='margin-top: 20px'>" +
+            data[i].description +
+            "</div></div>";
+          for (y in lesCommentaires) {
+            let laDateCommentaires = new Date(lesCommentaires[y].date);
+            affichageDiscussion +=
+              "<fieldset class='comments'>" +
+              `<legend>Reponse ${compteur}</legend>` +
+              "<div class='commentaireAffichage'>" +
+              "Auteur: " +
+              JSON.stringify(lesCommentaires[y].auteur) +
+              "</div>" +
+              "<div class='commentaireAffichage'>Commentaire: " +
+              JSON.stringify(lesCommentaires[y].commentaire) +
+              "</div>" +
+              "<div class='commentaireAffichage'>Fait le: " +
+              laDateCommentaires.toLocaleString() +
+              "</div></fieldset>";
+            compteur += 1;
+          }
+          affichageDiscussion += "</div>" + "</div>";
+          DernierCommenteurs = data[i].commentaires.length - 1; //Conserve la position du dernier commenteurs.
+          affichagePrincipale +=
+            "<div class='listePrincipale'>" +
+            "<div class='textPrincipale'>" +
+            "<div class='maxWidth'>" +
+            data[i].titre +
+            "</div>" +
+            "<div class='maxWidth'>" +
+            data[i].auteur +
+            "</div>" +
+            "<div class='maxWidth'>" +
+            `(${data[i].commentaires[DernierCommenteurs].auteur})` +
+            "</div>" +
+            "<div class='maxWidth'>" +
+            data[i].commentaires.length +
+            "</div></div>" +
+            affichageDiscussion +
+            "</div>";
+        }
+        $("#resultat").html(affichagePrincipale);
+        $(".frameset").hide(); // Cache les commentaires
+        $(".listePrincipale").click(function () {
+          $(".frameset").hide(1000); // Cache les commentaires ouvert precedement
+          $(this).children().show(1500); // Affiche les commentaires de la discussion
+        });
+      }
+    </script>
+  </body>
+</html>
