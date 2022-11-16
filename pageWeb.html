@@ -12,6 +12,29 @@
     <h1>Canal de discussion du TP1</h1>
     <div class="frameContainer">
       <button type="button" class="button">Ajouter une Discussion</button>
+      <form
+        action="/api/messages"
+        method="post"
+        class="ajoutNouvelleDiscussion"
+      >
+        <input
+          type="text"
+          name="titre"
+          id="nouvelleDiscussion"
+          placeholder="nom de la nouvelle discussion"
+        />
+        <input
+          type="text"
+          name="description"
+          id="nouvelleDiscussionContent"
+          placeholder="Entrez le contenue ici"
+        />
+        <input
+          type="submit"
+          value="Confirmer l'ajout de la discussion"
+          id="confirmNouvelleDiscussion"
+        />
+      </form>
       <div class="entete">
         <div class="ajustementDiscussion">Discussion:</div>
         <div class="ajustementAuteur">Lancée par:</div>
@@ -27,6 +50,7 @@
       fetch("http://127.0.0.1:8000/api/messages")
         .then((res) => res.json())
         .then((data) => {
+          console.log(data);
           affichageDesDonnees(data);
         });
       /**
@@ -57,6 +81,7 @@
             "<div style='margin-top: 20px'>" +
             data[i].description +
             "</div></div>";
+
           for (y in lesCommentaires) {
             let laDateCommentaires = new Date(lesCommentaires[y].date);
             affichageDiscussion +=
@@ -78,24 +103,35 @@
           DernierCommenteurs = data[i].commentaires.length - 1; //Conserve la position du dernier commenteurs.
           affichagePrincipale +=
             "<div class='listePrincipale'>" +
-            "<div class='textPrincipale'>" +
-            "<div class='maxWidth'>" +
-            data[i].titre +
-            "</div>" +
-            "<div class='maxWidth'>" +
-            data[i].auteur +
-            "</div>" +
-            "<div class='maxWidth'>" +
-            `(${data[i].commentaires[DernierCommenteurs].auteur})` +
-            "</div>" +
-            "<div class='maxWidth'>" +
-            data[i].commentaires.length +
-            "</div></div>" +
-            affichageDiscussion +
-            "</div>";
+              "<div class='textPrincipale'>" +
+              "<div class='maxWidth'>" +
+              data[i].titre +
+              "</div>" +
+              "<div class='maxWidth'>" +
+              data[i].auteur +
+              "</div>" +
+              "<div class='maxWidth'>" +
+              typeof data[i].commentaires[DernierCommenteurs].auteur !==
+            "undefined"
+              ? `(${data[i].commentaires[DernierCommenteurs].auteur})`
+              : `${data[i].auteur}` +
+                "</div>" +
+                "<div class='maxWidth'>" +
+                data[i].commentaires.length +
+                "</div></div>" +
+                affichageDiscussion +
+                "</div>";
         }
+
         $("#resultat").html(affichagePrincipale);
         $(".frameset").hide(); // Cache les commentaires
+        $(".ajoutNouvelleDiscussion").hide();
+        $(".button").click(function () {
+          $(".ajoutNouvelleDiscussion").show(1000);
+        });
+        $("#confirmNouvelleDiscussion").click(function () {
+          $(".ajoutNouvelleDiscussion").hide(1000);
+        });
         $(".listePrincipale").click(function () {
           $(".frameset").hide(1000); // Cache les commentaires ouvert precedement
           $(this).children().show(1500); // Affiche les commentaires de la discussion

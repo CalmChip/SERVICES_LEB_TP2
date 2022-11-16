@@ -33,7 +33,11 @@ module.exports.getMessagesByFilter = (filter, callback, limit) => {
 
 // API pour ajouter un message, date creer automatic
 module.exports.ajoutMessages = (mess, callback) => {
+  mess._id = `${Math.random() * 10}${Math.random() * 100}`;
   mess.date = Date.now();
+  mess.auteur = "jblb@gmail.com";
+  mess.langue = "Francais";
+  mess.commentaires = [];
   Messages.create(mess, callback);
 };
 

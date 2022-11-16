@@ -97,3 +97,18 @@ fieldset {
 .textInFrame {
   margin-left: 20px;
 }
+.ajoutNouvelleDiscussion {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  background-color: white;
+  border-radius: 15%;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+.ajoutNouvelleDiscussion > input {
+  margin-top: 20px;
+}
+#nouvelleDiscussionContent {
+  height: 60px;
+}
