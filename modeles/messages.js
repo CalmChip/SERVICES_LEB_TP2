@@ -52,12 +52,12 @@ module.exports.modifierUnMessage = (query, newMsg, callback) => {
   let filtre = { _id: query };
   let options = {};
   let nouveauMsg = {
-    _id: _id,
+    _id: newMsg._id,
     titre: newMsg.titre,
     auteur: newMsg.auteur,
     description: newMsg.description,
     date: Date.now(),
-    langue: "Francais",
+    langue: newMsg.langue,
     commentaires: newMsg.commentaires,
   };
   Messages.findOneAndUpdate(filtre, nouveauMsg, options, callback);

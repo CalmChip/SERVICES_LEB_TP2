@@ -13,8 +13,9 @@
     <div class="frameContainer">
       <button type="button" class="button">Ajouter une Discussion</button>
       <form
-        action="/api/messages"
-        method="post"
+        action="#"
+        method="#"
+        onSubmit="ajouterDiscussion(); return false"
         class="ajoutNouvelleDiscussion"
       >
         <input
@@ -47,18 +48,67 @@
       </div>
     </div>
     <script>
-      fetch("http://127.0.0.1:8000/api/messages")
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          affichageDesDonnees(data);
-        });
-
-      function repondre(id) {
-        fetch(`http://127.0.0.1:8000/api/messages/${id}`, {
-            method: "PUT",
-          })
+      // Function qui permet le chargement de la page web.
+      function chargementInitial() {
+        fetch("http://127.0.0.1:8000/api/messages")
+          .then((res) => res.json())
+          .then((data) => {
+            console.log(data);
+            affichageDesDonnees(data);
+          });
       }
+      //Appele du chargement Initial
+      chargementInitial();
+      function ajouterDiscussion() {
+        let newDiscussion = {
+          titre: document.getElementById(`titre`).value,
+          description: document.getElementById(`description`).value,
+        };
+        fetch(`http://127.0.0.1:8000/api/messages`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newDiscussion),
+        })
+          .then((response) => {
+            response.json();
+            chargementInitial();
+          })
+          .catch((error) => {
+            console.log("Error:", error);
+          });
+      }
+      // Function qui permet de repondre a une discussion. id = id de la discussion
+      function repondre(id) {
+        console.log(`#answer_${id}`);
+        let contenueReponse = {
+          commentaire: document.getElementById(`answer_${id}`).value,
+          auteur: "Test@gmail.com",
+          date: "01/01/2022",
+        };
+        fetch(`http://127.0.0.1:8000/api/messages/${id}`)
+          .then((response) => response.json())
+          .then((data) => {
+            data.commentaires.push(contenueReponse);
+            fetch(`http://127.0.0.1:8000/api/messages/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                console.log("Success:", data);
+                chargementInitial();
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+              });
+          });
+      }
+      // Function qui permet de supprimer une discussion
       function supprimer(id) {
         let trueOrFalse = confirm(
           "Are you sure you wish to delete " + id + "?"
@@ -66,14 +116,10 @@
         if (trueOrFalse) {
           fetch(`http://127.0.0.1:8000/api/messages/${id}`, {
             method: "DELETE",
-          }).then(
-            fetch("http://127.0.0.1:8000/api/messages")
-              .then((res) => res.json())
-              .then((data) => {
-                affichageDesDonnees(data);
-                alert("Discussion, supprimer avec success");
-              })
-          );
+          }).then(() => {
+            alert("Discussion, supprimer avec success");
+            chargementInitial();
+          });
         }
       }
       /**
@@ -88,6 +134,7 @@
         for (i in data) {
           let compteur = 1; // Permet de savoir combien il y a de commentaires
           lesCommentaires = data[i].commentaires; //Converve les commentaires
+          console.log(lesCommentaires);
           let laDate = new Date(data[i].date);
           affichageDiscussion = `<div class='frameset'><p>
             <span>Discussion - par
@@ -124,9 +171,10 @@
               "</div></fieldset>";
             compteur += 1;
           }
-          affichageDiscussion += `<button type='button' id='repondreDiscussion' onclick="">Répondre</button>
-          <form method='post' action=''>
-            <input type="text" name="commentaire" placeholder="entrez votre reponse ici" />
+          affichageDiscussion += `<button type='button' class='repondreDiscussion' onclick="">Répondre</button>
+          <form method='#' action="#" onSubmit='repondre("${data[i]._id}"); return false'>
+            <input  id="answer_${data[i]._id}" class="enterAnswer" type="text"  name="commentaires" placeholder="entrez votre reponse ici" />
+            <button  type='submit' class='ajouterReponse'>Ajouter une reponse</button>
           </form>
           </div></div>`;
           DernierCommenteurs = data[i].commentaires.length - 1; //Conserve la position du dernier commenteurs.
@@ -155,10 +203,22 @@
             affichageDiscussion +
             "</div>";
         }
-
         $("#resultat").html(affichagePrincipale);
         $(".frameset").hide(); // Cache les commentaires
-        $(".ajoutNouvelleDiscussion").hide();
+        $(".enterAnswer").hide(); // Cache le formulaire de reponse
+        $(".ajouterReponse").hide(); // Cache le boutton du formulaire de reponse
+        $(".ajoutNouvelleDiscussion").hide(); // Cache le formulaire d ajout d'une discussion
+        // click pour afficher le formulaire de reponse avec son button
+        $(".repondreDiscussion").click(function () {
+          $(".enterAnswer").show();
+          $(".ajouterReponse").show();
+        });
+        // Permet de fermer le formulaire de reponse lors de l'envoit d'une reponse
+        $(".ajouterReponse").click(function () {
+          $(".enterAnswer").hide();
+          $(".ajouterReponse").hide();
+        });
+
         $(".button").click(function () {
           $(".ajoutNouvelleDiscussion").show(1000);
         });
@@ -166,8 +226,10 @@
           $(".ajoutNouvelleDiscussion").hide(1000);
         });
         $(".listePrincipale").click(function () {
-          $(".frameset").hide(1000); // Cache les commentaires ouvert precedement
           $(this).children().show(1500); // Affiche les commentaires de la discussion
+        });
+        $(".listePrincipale").dblclick(function () {
+          $(".frameset").hide(1000); // Cache les commentaires ouvert precedement
         });
       }
     </script>
